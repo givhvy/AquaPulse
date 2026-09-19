@@ -40,40 +40,30 @@ struct AquaRoot: View {
     private var showsTabBar: Bool { screen == "home" || screen == "rituals" || screen == "week" }
 
     var body: some View {
-        GeometryReader { proxy in
-            let scale = proxy.size.width / 353
-            let designHeight = proxy.size.height / scale
-            let tabBottom = AquaTabMetrics.bottomInset + max(proxy.safeAreaInsets.bottom / scale * 0.2, 0)
-            ZStack(alignment: .top) {
-                LinearGradient(colors: [Aqua.bgTop, Aqua.bgMid, Aqua.bgBottom], startPoint: .top, endPoint: .bottom)
-                    .ignoresSafeArea()
-                ZStack(alignment: .bottom) {
-                    Group {
-                        if screen == "rituals" { rituals }
-                        else if screen == "week" { week }
-                        else if screen == "glasses" { glasses }
-                        else { home }
-                    }
-                    .frame(width: 353, height: designHeight, alignment: .top)
-                    .padding(.bottom, showsTabBar ? AquaTabMetrics.contentClearance : 0)
-                    .id(screen)
-                    .transition(screenTransition)
-                    if showsTabBar {
-                        AquaGlassTabBar(tab: tab, namespace: tabGlass, motion: motion) { index in
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            if index == 0 { go("home", back: screen != "home") }
-                            if index == 1 { go("rituals", back: screen == "week") }
-                            if index == 2 { go("week") }
-                        }
-                        .padding(.horizontal, 22)
-                        .padding(.bottom, tabBottom)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
+        ZStack {
+            LinearGradient(colors: [Aqua.bgTop, Aqua.bgMid, Aqua.bgBottom], startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
+            Group {
+                if screen == "rituals" { rituals }
+                else if screen == "week" { week }
+                else if screen == "glasses" { glasses }
+                else { home }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .id(screen)
+            .transition(screenTransition)
+            .animation(motion, value: screen)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 8) {
+            if showsTabBar {
+                AquaGlassTabBar(tab: tab, namespace: tabGlass, motion: motion) { index in
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    if index == 0 { go("home", back: screen != "home") }
+                    if index == 1 { go("rituals", back: screen == "week") }
+                    if index == 2 { go("week") }
                 }
-                .frame(width: 353, height: designHeight, alignment: .top)
-                .scaleEffect(scale, anchor: .top)
-                .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
-                .animation(motion, value: screen)
+                .padding(.horizontal, 22)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .font(.system(size: 14, weight: .regular))
@@ -141,6 +131,7 @@ struct AquaRoot: View {
     }
 
     private var home: some View {
+        ScrollView(showsIndicators: false) {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 HStack(spacing: 8) {
@@ -301,11 +292,11 @@ struct AquaRoot: View {
                 .featuredCard()
             }
             .buttonStyle(AquaPressStyle())
-
-            Spacer(minLength: 4)
         }
         .padding(.horizontal, 15)
         .padding(.top, 10)
+        .padding(.bottom, 20)
+        }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 16)
     }
@@ -388,12 +379,12 @@ struct AquaRoot: View {
                             .animation(motion.delay(Double(index) * 0.05), value: sorted)
                     }
                 }
-                .padding(.bottom, 96)
+                .padding(.bottom, 72)
             }
         }
         .padding(.horizontal, 15)
         .padding(.top, 10)
-        .overlay(alignment: .bottom) {
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             HStack(spacing: 8) {
                 Button {
                     withAnimation(AquaMotion.snappy) { sorted.toggle() }
@@ -419,7 +410,7 @@ struct AquaRoot: View {
                 }
                 .buttonStyle(AquaPressStyle())
             }
-            .padding(.bottom, AquaTabMetrics.contentClearance + 8)
+            .padding(.bottom, 8)
         }
     }
 
@@ -614,7 +605,7 @@ struct AquaRoot: View {
         }
         .padding(.horizontal, 15)
         .padding(.top, 10)
-        .overlay(alignment: .bottom) {
+        .safeAreaInset(edge: .bottom) {
             HStack {
                 VStack(alignment: .leading, spacing: 7) {
                     Text(isWater ? "\(store.litersDrunk) L" : "\(selected.count)/\(goal)")
@@ -632,12 +623,12 @@ struct AquaRoot: View {
                     .disabled(selected.isEmpty)
             }
             .padding(15)
-            .padding(.bottom, 32)
             .background(
                 RoundedRectangle(cornerRadius: 17)
                     .fill(.white.opacity(0.035))
                     .overlay(RoundedRectangle(cornerRadius: 17).stroke(.white.opacity(0.05)))
             )
+            .padding(.bottom, 4)
         }
     }
 

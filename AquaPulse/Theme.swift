@@ -173,8 +173,6 @@ func aquaAccent(_ name: String) -> Color {
 
 enum AquaTabMetrics {
     static let pillHeight: CGFloat = 52
-    static let bottomInset: CGFloat = 4
-    static let contentClearance: CGFloat = 62
 }
 
 struct LiquidGlassCapsule: ViewModifier {
