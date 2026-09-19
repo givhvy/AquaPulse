@@ -4,17 +4,18 @@ SwiftUI iOS water reminder and consistency tracker, using the same dark navy / m
 
 The app includes:
 
-- Daily hydration goal, glass size, and one-tap logging
+- Native `TabView` (system Liquid Glass tab pill on iOS 26)
+- Daily hydration goal, glass size, and sequential glass check-in
 - Consistency rituals (stretch, read, walk, sleep, and custom habits)
-- Streaks, a weekly board, and a glass check-in grid
+- Weekly consistency board
 - Local reminders for water and daily rituals
 
 ## Run
 
-Open `AquaPulse.xcodeproj` in Xcode and run the `AquaPulse` scheme on an iOS Simulator.
+Open `AquaPulse.xcodeproj` in Xcode and run the `AquaPulse` scheme on an iOS Simulator (iPhone 17 Pro).
 
 Optional launch arguments:
 
-- `-screen rituals` opens the ritual list
+- `-screen rituals` opens the ritual list tab
 - `-screen week` opens the weekly consistency board
-- `-screen glasses` opens the glass check-in grid
+- `-screen glasses` pushes the water glass grid from Home

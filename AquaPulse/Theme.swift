@@ -20,6 +20,14 @@ enum AquaMotion {
     static let press = Animation.spring(response: 0.22, dampingFraction: 0.72)
 }
 
+enum MainTab: Hashable {
+    case home, rituals, week
+}
+
+enum AquaRoute: Hashable {
+    case glasses(UUID)
+}
+
 struct GlowButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -86,6 +94,21 @@ extension View {
         )
         .overlay(RoundedRectangle(cornerRadius: 17).stroke(.white.opacity(0.27), lineWidth: 0.7))
     }
+
+    @ViewBuilder
+    func aquaTabMinimize() -> some View {
+        if #available(iOS 26, *) {
+            tabBarMinimizeBehavior(.onScrollDown)
+        } else {
+            self
+        }
+    }
+
+    func aquaScreen() -> some View {
+        font(.system(size: 14, weight: .regular))
+            .foregroundStyle(.white)
+            .toolbarBackground(.hidden, for: .navigationBar)
+    }
 }
 
 struct CircleIconButton: View {
@@ -94,16 +117,23 @@ struct CircleIconButton: View {
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: symbol)
-                .font(.system(size: 13, weight: .light))
-                .frame(width: 44, height: 44)
-                .background(Aqua.panel.opacity(0.5), in: Circle())
-                .overlay(
-                    Circle().stroke(
-                        LinearGradient(colors: [.white.opacity(0.015), .white.opacity(0.18)], startPoint: .top, endPoint: .bottom),
-                        lineWidth: 0.6
+            if #available(iOS 26, *) {
+                Image(systemName: symbol)
+                    .font(.system(size: 13, weight: .light))
+                    .frame(width: 44, height: 44)
+                    .glassEffect(.regular.interactive(), in: .circle)
+            } else {
+                Image(systemName: symbol)
+                    .font(.system(size: 13, weight: .light))
+                    .frame(width: 44, height: 44)
+                    .background(Aqua.panel.opacity(0.5), in: Circle())
+                    .overlay(
+                        Circle().stroke(
+                            LinearGradient(colors: [.white.opacity(0.015), .white.opacity(0.18)], startPoint: .top, endPoint: .bottom),
+                            lineWidth: 0.6
+                        )
                     )
-                )
+            }
         }
         .buttonStyle(AquaPressStyle())
     }
@@ -113,17 +143,27 @@ struct OrbitingDrop: View {
     var reduceMotion = false
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: reduceMotion ? 10 : 1 / 30, paused: reduceMotion)) { timeline in
-            let t = reduceMotion ? 0.5 : (sin(timeline.date.timeIntervalSinceReferenceDate * 1.35) + 1) / 2
-            Image(systemName: "drop.fill")
-                .font(.system(size: 10))
-                .foregroundStyle(Aqua.mint)
-                .frame(width: 22, height: 22)
-                .background(Aqua.tealFill, in: Circle())
-                .overlay(Circle().stroke(Aqua.mint.opacity(0.24)))
-                .offset(x: (t - 0.5) * 54, y: -sin(t * .pi) * 11)
-                .shadow(color: Aqua.mint.opacity(reduceMotion ? 0 : 0.35), radius: 6)
+        if reduceMotion {
+            staticDrop
+        } else {
+            TimelineView(.animation(minimumInterval: 1 / 30)) { timeline in
+                let t = (sin(timeline.date.timeIntervalSinceReferenceDate * 1.35) + 1) / 2
+                drop
+                    .offset(x: (t - 0.5) * 54, y: -sin(t * .pi) * 11)
+                    .shadow(color: Aqua.mint.opacity(0.35), radius: 6)
+            }
         }
+    }
+
+    private var staticDrop: some View { drop }
+
+    private var drop: some View {
+        Image(systemName: "drop.fill")
+            .font(.system(size: 10))
+            .foregroundStyle(Aqua.mint)
+            .frame(width: 22, height: 22)
+            .background(Aqua.tealFill, in: Circle())
+            .overlay(Circle().stroke(Aqua.mint.opacity(0.24)))
     }
 }
 
@@ -136,7 +176,7 @@ struct SipArc: Shape {
     }
 }
 
-struct GlassShape: Shape {
+struct CupShape: Shape {
     func path(in rect: CGRect) -> Path {
         var p = Path()
         p.move(to: CGPoint(x: 8, y: 0))
@@ -171,79 +211,54 @@ func aquaAccent(_ name: String) -> Color {
     }
 }
 
-enum AquaTabMetrics {
-    static let pillHeight: CGFloat = 52
-}
+struct JourneyRow: View {
+    let leftTime: String
+    let leftCode: String
+    let leftCity: String
+    let rightTime: String
+    let rightCode: String
+    let rightCity: String
+    let duration: String
+    var animated: Bool = false
+    var reduceMotion: Bool = false
 
-struct LiquidGlassCapsule: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26, *) {
-            content
-                .glassEffect(.regular.tint(Aqua.mint.opacity(0.14)).interactive(), in: .capsule)
-        } else {
-            content
-                .background {
-                    Capsule()
-                        .fill(.ultraThinMaterial)
-                        .overlay(
-                            Capsule().stroke(
-                                LinearGradient(
-                                    colors: [.white.opacity(0.24), .white.opacity(0.05), Aqua.mint.opacity(0.22)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 0.8
-                            )
-                        )
-                        .shadow(color: .black.opacity(0.28), radius: 14, y: 5)
+    var body: some View {
+        HStack(alignment: .center, spacing: 4) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(leftTime).font(.system(size: 11)).foregroundStyle(Aqua.muted)
+                Text(leftCode).font(.system(size: 22, weight: .light))
+                Text(leftCity).font(.system(size: 11)).foregroundStyle(Aqua.muted)
+            }
+            Spacer(minLength: 0)
+            VStack(spacing: 1) {
+                ZStack {
+                    SipArc()
+                        .stroke(Aqua.muted.opacity(0.85), style: StrokeStyle(lineWidth: 0.8, dash: [1, 3]))
+                        .frame(height: 26)
+                        .offset(y: 9)
+                    if animated && !reduceMotion {
+                        OrbitingDrop()
+                    } else {
+                        OrbitingDrop(reduceMotion: true)
+                    }
                 }
+                .frame(height: 34)
+                Text(duration).font(.system(size: 8)).foregroundStyle(Aqua.muted)
+            }
+            .frame(maxWidth: 140)
+            Spacer(minLength: 0)
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(rightTime).font(.system(size: 11)).foregroundStyle(Aqua.muted)
+                Text(rightCode).font(.system(size: 22, weight: .light))
+                Text(rightCity).lineLimit(1).font(.system(size: 11)).foregroundStyle(Aqua.muted)
+            }
         }
     }
 }
 
-struct AquaGlassTabBar: View {
-    let tab: Int
-    let namespace: Namespace.ID
-    let motion: Animation
-    let onSelect: (Int) -> Void
-
-    private let icons = ["house.fill", "calendar", "circle.grid.2x2"]
-
+struct AquaBackground: View {
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(icons.indices, id: \.self) { index in
-                Button {
-                    onSelect(index)
-                } label: {
-                    ZStack {
-                        if tab == index {
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Aqua.mint.opacity(0.34), Aqua.mint.opacity(0.12)],
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                )
-                                .frame(width: 42, height: 42)
-                                .matchedGeometryEffect(id: "tabLens", in: namespace)
-                                .shadow(color: Aqua.mint.opacity(0.35), radius: 8)
-                        }
-                        Image(systemName: icons[index])
-                            .font(.system(size: 17, weight: .light))
-                            .foregroundStyle(tab == index ? .white : Color(red: 0.75, green: 0.86, blue: 0.86))
-                            .scaleEffect(tab == index ? 1.12 : 1)
-                            .symbolEffect(.bounce, value: tab == index)
-                            .animation(motion, value: tab)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 44)
-                }
-                .buttonStyle(AquaPressStyle())
-            }
-        }
-        .padding(.horizontal, 10)
-        .frame(height: AquaTabMetrics.pillHeight)
-        .modifier(LiquidGlassCapsule())
+        LinearGradient(colors: [Aqua.bgTop, Aqua.bgMid, Aqua.bgBottom], startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
     }
 }

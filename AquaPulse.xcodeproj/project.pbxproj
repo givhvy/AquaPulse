@@ -8,14 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		028BDA6287F1CAA66556C265 /* AquaPulseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5FD70213AC73A561084FCA7 /* AquaPulseApp.swift */; };
+		39C8D7DD5C3E3E4F7F0033FB /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E34F46960A7CFE700B071E2 /* WeekView.swift */; };
 		483932E92FEFC95B3849757E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD337E24AF014703713A64BB /* Theme.swift */; };
+		4DE841B4A9DBDA6F071690E2 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BCD4ADEF4563FF64F1CF713 /* HomeView.swift */; };
 		4F1A84EC2D2181FF14EB432B /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41556E20CB7D177F79D6AF94 /* Store.swift */; };
+		A19101FB97A28F920422CBFD /* RitualsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C93AA106F4EF936E6D9E4B /* RitualsView.swift */; };
+		A21B3E2482964E5B7A4936F0 /* AddRitualSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEAF68C5EE39ACA95FEF37D /* AddRitualSheet.swift */; };
+		BB246AB2B231E3A0E7BAE615 /* GlassesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF89FB9A6A3FD675404E4BE0 /* GlassesView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0CEAF68C5EE39ACA95FEF37D /* AddRitualSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRitualSheet.swift; sourceTree = "<group>"; };
+		2BCD4ADEF4563FF64F1CF713 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		34C93AA106F4EF936E6D9E4B /* RitualsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualsView.swift; sourceTree = "<group>"; };
 		41556E20CB7D177F79D6AF94 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
+		5E34F46960A7CFE700B071E2 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
 		B235A21300042A51AA73216D /* AquaPulse.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AquaPulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD337E24AF014703713A64BB /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		CF89FB9A6A3FD675404E4BE0 /* GlassesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassesView.swift; sourceTree = "<group>"; };
 		E5FD70213AC73A561084FCA7 /* AquaPulseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaPulseApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -23,9 +33,14 @@
 		1735C9CC551F7AC3E7D65183 /* AquaPulse */ = {
 			isa = PBXGroup;
 			children = (
+				0CEAF68C5EE39ACA95FEF37D /* AddRitualSheet.swift */,
 				E5FD70213AC73A561084FCA7 /* AquaPulseApp.swift */,
+				CF89FB9A6A3FD675404E4BE0 /* GlassesView.swift */,
+				2BCD4ADEF4563FF64F1CF713 /* HomeView.swift */,
+				34C93AA106F4EF936E6D9E4B /* RitualsView.swift */,
 				41556E20CB7D177F79D6AF94 /* Store.swift */,
 				CD337E24AF014703713A64BB /* Theme.swift */,
+				5E34F46960A7CFE700B071E2 /* WeekView.swift */,
 			);
 			path = AquaPulse;
 			sourceTree = "<group>";
@@ -101,9 +116,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A21B3E2482964E5B7A4936F0 /* AddRitualSheet.swift in Sources */,
 				028BDA6287F1CAA66556C265 /* AquaPulseApp.swift in Sources */,
+				BB246AB2B231E3A0E7BAE615 /* GlassesView.swift in Sources */,
+				4DE841B4A9DBDA6F071690E2 /* HomeView.swift in Sources */,
+				A19101FB97A28F920422CBFD /* RitualsView.swift in Sources */,
 				4F1A84EC2D2181FF14EB432B /* Store.swift in Sources */,
 				483932E92FEFC95B3849757E /* Theme.swift in Sources */,
+				39C8D7DD5C3E3E4F7F0033FB /* WeekView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
