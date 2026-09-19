@@ -17,6 +17,7 @@ struct AquaRoot: View {
     @Environment(AquaStore.self) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Namespace private var pills
+    @Namespace private var tabGlass
     @State private var screen: String = {
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: "-screen"), args.indices.contains(i + 1) { return args[i + 1] }
@@ -36,12 +37,13 @@ struct AquaRoot: View {
     @State private var appeared = false
 
     private var motion: Animation { reduceMotion ? .easeInOut(duration: 0.2) : AquaMotion.ui }
+    private var showsTabBar: Bool { screen == "home" || screen == "rituals" || screen == "week" }
 
     var body: some View {
         GeometryReader { proxy in
             let scale = proxy.size.width / 353
             let designHeight = proxy.size.height / scale
-            let bottomSafe = max(proxy.safeAreaInsets.bottom / scale, 8)
+            let tabBottom = AquaTabMetrics.bottomInset + max(proxy.safeAreaInsets.bottom / scale * 0.2, 0)
             ZStack(alignment: .top) {
                 LinearGradient(colors: [Aqua.bgTop, Aqua.bgMid, Aqua.bgBottom], startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea()
@@ -53,10 +55,19 @@ struct AquaRoot: View {
                         else { home }
                     }
                     .frame(width: 353, height: designHeight, alignment: .top)
+                    .padding(.bottom, showsTabBar ? AquaTabMetrics.contentClearance : 0)
                     .id(screen)
                     .transition(screenTransition)
-                    if screen == "home" {
-                        tabBar.padding(.bottom, bottomSafe)
+                    if showsTabBar {
+                        AquaGlassTabBar(tab: tab, namespace: tabGlass, motion: motion) { index in
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            if index == 0 { go("home", back: screen != "home") }
+                            if index == 1 { go("rituals", back: screen == "week") }
+                            if index == 2 { go("week") }
+                        }
+                        .padding(.horizontal, 22)
+                        .padding(.bottom, tabBottom)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                 }
                 .frame(width: 353, height: designHeight, alignment: .top)
@@ -127,18 +138,6 @@ struct AquaRoot: View {
             if next == "rituals" { tab = 1 }
             if next == "week" { tab = 2 }
         }
-    }
-
-    private var tabBar: some View {
-        HStack {
-            navIcon("house.fill", index: 0)
-            Spacer()
-            navIcon("calendar", index: 1)
-            Spacer()
-            navIcon("circle.grid.2x2", index: 2)
-        }
-        .padding(.horizontal, 59)
-        .frame(height: 44)
     }
 
     private var home: some View {
@@ -303,11 +302,10 @@ struct AquaRoot: View {
             }
             .buttonStyle(AquaPressStyle())
 
-            Spacer(minLength: 8)
+            Spacer(minLength: 4)
         }
         .padding(.horizontal, 15)
         .padding(.top, 10)
-        .padding(.bottom, 58)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 16)
     }
@@ -343,24 +341,6 @@ struct AquaRoot: View {
         case "Streaks": return "See the board"
         default: return "Log \(store.glassML) ml"
         }
-    }
-
-    private func navIcon(_ name: String, index: Int) -> some View {
-        Button {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            if index == 0 { go("home", back: screen != "home") }
-            if index == 1 { go("rituals", back: screen == "week" || screen == "glasses") }
-            if index == 2 { go("week") }
-        } label: {
-            Image(systemName: name)
-                .font(.system(size: 18, weight: .light))
-                .foregroundStyle(tab == index ? .white : Color(red: 0.75, green: 0.86, blue: 0.86))
-                .scaleEffect(tab == index ? 1.14 : 1)
-                .shadow(color: tab == index ? .white.opacity(0.35) : .clear, radius: 8)
-                .symbolEffect(.bounce, value: tab == index)
-                .animation(motion, value: tab)
-        }
-        .buttonStyle(.plain)
     }
 
     private func routeField(_ title: String, name: String, icon: String) -> some View {
@@ -408,7 +388,7 @@ struct AquaRoot: View {
                             .animation(motion.delay(Double(index) * 0.05), value: sorted)
                     }
                 }
-                .padding(.bottom, 80)
+                .padding(.bottom, 96)
             }
         }
         .padding(.horizontal, 15)
@@ -439,7 +419,7 @@ struct AquaRoot: View {
                 }
                 .buttonStyle(AquaPressStyle())
             }
-            .padding(.bottom, 24)
+            .padding(.bottom, AquaTabMetrics.contentClearance + 8)
         }
     }
 
@@ -554,7 +534,7 @@ struct AquaRoot: View {
                         .aquaCard()
                     }
                 }
-                .padding(.bottom, 70)
+                .padding(.bottom, 24)
             }
         }
         .padding(.horizontal, 15)

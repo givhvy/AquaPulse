@@ -170,3 +170,82 @@ func aquaAccent(_ name: String) -> Color {
     default: return Color(red: 0.0, green: 0.55, blue: 0.5)
     }
 }
+
+enum AquaTabMetrics {
+    static let pillHeight: CGFloat = 52
+    static let bottomInset: CGFloat = 4
+    static let contentClearance: CGFloat = 62
+}
+
+struct LiquidGlassCapsule: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content
+                .glassEffect(.regular.tint(Aqua.mint.opacity(0.14)).interactive(), in: .capsule)
+        } else {
+            content
+                .background {
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .overlay(
+                            Capsule().stroke(
+                                LinearGradient(
+                                    colors: [.white.opacity(0.24), .white.opacity(0.05), Aqua.mint.opacity(0.22)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 0.8
+                            )
+                        )
+                        .shadow(color: .black.opacity(0.28), radius: 14, y: 5)
+                }
+        }
+    }
+}
+
+struct AquaGlassTabBar: View {
+    let tab: Int
+    let namespace: Namespace.ID
+    let motion: Animation
+    let onSelect: (Int) -> Void
+
+    private let icons = ["house.fill", "calendar", "circle.grid.2x2"]
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(icons.indices, id: \.self) { index in
+                Button {
+                    onSelect(index)
+                } label: {
+                    ZStack {
+                        if tab == index {
+                            Circle()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Aqua.mint.opacity(0.34), Aqua.mint.opacity(0.12)],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .frame(width: 42, height: 42)
+                                .matchedGeometryEffect(id: "tabLens", in: namespace)
+                                .shadow(color: Aqua.mint.opacity(0.35), radius: 8)
+                        }
+                        Image(systemName: icons[index])
+                            .font(.system(size: 17, weight: .light))
+                            .foregroundStyle(tab == index ? .white : Color(red: 0.75, green: 0.86, blue: 0.86))
+                            .scaleEffect(tab == index ? 1.12 : 1)
+                            .symbolEffect(.bounce, value: tab == index)
+                            .animation(motion, value: tab)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                }
+                .buttonStyle(AquaPressStyle())
+            }
+        }
+        .padding(.horizontal, 10)
+        .frame(height: AquaTabMetrics.pillHeight)
+        .modifier(LiquidGlassCapsule())
+    }
+}
