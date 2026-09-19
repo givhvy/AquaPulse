@@ -6,9 +6,18 @@ struct AquaPulseApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AquaRoot()
-                .environment(store)
-                .preferredColorScheme(.dark)
+            Group {
+                if store.didOnboard {
+                    AquaRoot()
+                } else {
+                    OnboardingView()
+                }
+            }
+            .environment(store)
+            .preferredColorScheme(.dark)
+            #if DEBUG
+            .onAppear { applyDebugLaunchSeed(store) }
+            #endif
         }
     }
 }
@@ -42,3 +51,13 @@ struct AquaRoot: View {
         .aquaTabMinimize()
     }
 }
+
+#if DEBUG
+@MainActor
+private func applyDebugLaunchSeed(_ store: AquaStore) {
+    let args = ProcessInfo.processInfo.arguments
+    guard args.contains("-seedSession"), !store.didOnboard else { return }
+    store.finishOnboarding(name: "Huy", goalML: 2000, glassML: 250, extraKinds: ["stretch"])
+    store.setGlasses(3)
+}
+#endif

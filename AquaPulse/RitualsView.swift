@@ -2,50 +2,65 @@ import SwiftUI
 
 struct RitualsView: View {
     @Environment(AquaStore.self) private var store
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var path = NavigationPath()
     @State private var sorted = false
     @State private var showAdd = false
+    @State private var query = ""
 
-    private var motion: Animation { reduceMotion ? .easeInOut(duration: 0.2) : AquaMotion.ui }
-
-    private var sortedRituals: [Ritual] {
-        sorted
+    private var filtered: [Ritual] {
+        let base = sorted
             ? store.rituals.sorted { $0.streak > $1.streak }
             : store.rituals.sorted { ($0.isComplete ? 1 : 0) < ($1.isComplete ? 1 : 0) }
+        let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !q.isEmpty else { return base }
+        return base.filter { $0.name.localizedCaseInsensitiveContains(q) || $0.kind.localizedCaseInsensitiveContains(q) }
     }
 
     var body: some View {
         NavigationStack(path: $path) {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("\(store.rituals.count) Rituals\nactive")
-                        .font(.system(size: 30, weight: .light))
-                        .padding(.bottom, 6)
-                    Text(sorted ? "Sorted by longest streak" : "Due first")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Aqua.muted)
-                        .padding(.bottom, 14)
-
-                    VStack(spacing: 15) {
-                        ForEach(Array(sortedRituals.enumerated()), id: \.element.id) { index, ritual in
+            Group {
+                if store.rituals.isEmpty {
+                    empty
+                } else {
+                    List {
+                        Section {
+                            Text("\(store.rituals.count) Rituals\nactive")
+                                .font(.system(size: 30, weight: .light))
+                                .foregroundStyle(.white)
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                            Text(sorted ? "Sorted by longest streak" : "Due first. Swipe a non-water ritual to delete.")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Aqua.muted)
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                        }
+                        ForEach(filtered) { ritual in
                             Button {
                                 path.append(AquaRoute.glasses(ritual.id))
                             } label: {
                                 ritualCard(ritual)
                             }
                             .buttonStyle(AquaPressStyle())
-                            .transition(.opacity)
-                            .animation(motion.delay(Double(index) * 0.05), value: sorted)
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 18, bottom: 6, trailing: 18))
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                if !ritual.isWater {
+                                    Button("Delete", role: .destructive) {
+                                        store.deleteRitual(ritual.id)
+                                    }
+                                }
+                            }
                         }
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
-                .padding(.horizontal, 18)
-                .padding(.top, 8)
-                .padding(.bottom, 24)
             }
             .background(AquaBackground())
             .aquaScreen()
+            .searchable(text: $query, prompt: "Search rituals")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -81,6 +96,19 @@ struct RitualsView: View {
                     .presentationDetents([.medium, .large])
             }
         }
+    }
+
+    private var empty: some View {
+        VStack(spacing: 12) {
+            Text("No rituals yet")
+                .font(.system(size: 28, weight: .light))
+            Text("Add a ritual with + to start a consistency streak.")
+                .font(.system(size: 13))
+                .foregroundStyle(Aqua.muted)
+                .multilineTextAlignment(.center)
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func ritualCard(_ ritual: Ritual) -> some View {

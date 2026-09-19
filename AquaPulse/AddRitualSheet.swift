@@ -14,6 +14,27 @@ struct AddRitualSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text("New ritual").font(.title2)
+            let unused = Ritual.extraTemplates.filter { template in
+                !store.rituals.contains { $0.id == template.id }
+            }
+            if !unused.isEmpty {
+                Text("Templates").font(.system(size: 13)).foregroundStyle(Aqua.muted)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(unused) { ritual in
+                            Button(ritual.name) {
+                                store.addCatalogRitual(ritual)
+                                dismiss()
+                            }
+                            .font(.system(size: 13))
+                            .padding(.horizontal, 12)
+                            .frame(height: 34)
+                            .background(Aqua.panel, in: Capsule())
+                            .overlay(Capsule().stroke(.white.opacity(0.12)))
+                        }
+                    }
+                }
+            }
             TextField("Name", text: $name)
                 .textFieldStyle(.plain)
                 .padding(14)

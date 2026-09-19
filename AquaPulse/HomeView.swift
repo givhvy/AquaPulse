@@ -44,25 +44,35 @@ struct HomeView: View {
                     .padding(.bottom, 23)
 
                     Text("Longest streak").font(.system(size: 15)).padding(.bottom, 13)
-                    Button {
-                        path.append(AquaRoute.glasses(store.bestStreak.id))
-                    } label: {
-                        JourneyRow(
-                            leftTime: "07:00 AM",
-                            leftCode: "0 ml",
-                            leftCity: "START",
-                            rightTime: "09:00 PM",
-                            rightCode: "\(store.litersGoal) L",
-                            rightCity: store.bestStreak.name.uppercased(),
-                            duration: "\(store.bestStreak.streak) day streak",
-                            animated: true,
-                            reduceMotion: reduceMotion
-                        )
-                        .padding(14)
-                        .frame(height: 95)
-                        .featuredCard()
+                    if store.hasAnyStreak {
+                        Button {
+                            path.append(AquaRoute.glasses(store.bestStreak.id))
+                        } label: {
+                            JourneyRow(
+                                leftTime: "07:00 AM",
+                                leftCode: "0 ml",
+                                leftCity: "START",
+                                rightTime: "09:00 PM",
+                                rightCode: "\(store.litersGoal) L",
+                                rightCity: store.bestStreak.name.uppercased(),
+                                duration: "\(store.bestStreak.streak) day streak",
+                                animated: true,
+                                reduceMotion: reduceMotion
+                            )
+                            .padding(14)
+                            .frame(height: 95)
+                            .featuredCard()
+                        }
+                        .buttonStyle(AquaPressStyle())
+                    } else {
+                        Text("Streaks start after you finish a ritual for the day. Check in once to begin.")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Aqua.muted)
+                            .padding(14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(minHeight: 95)
+                            .aquaCard()
                     }
-                    .buttonStyle(AquaPressStyle())
                 }
                 .padding(.horizontal, 18)
                 .padding(.top, 8)
@@ -72,8 +82,11 @@ struct HomeView: View {
             .aquaScreen()
             .navigationBarHidden(true)
             .navigationDestination(for: AquaRoute.self) { route in
-                if case .glasses(let id) = route {
+                switch route {
+                case .glasses(let id):
                     GlassesView(ritualID: id)
+                case .profile:
+                    ProfileView()
                 }
             }
             .opacity(appeared ? 1 : 0)
@@ -85,9 +98,15 @@ struct HomeView: View {
                 let args = ProcessInfo.processInfo.arguments
                 if let i = args.firstIndex(of: "-screen"),
                    args.indices.contains(i + 1),
-                   args[i + 1] == "glasses",
                    path.isEmpty {
-                    path.append(AquaRoute.glasses(store.waterRitual?.id ?? Ritual.empty.id))
+                    switch args[i + 1] {
+                    case "glasses":
+                        path.append(AquaRoute.glasses(store.waterRitual?.id ?? Ritual.empty.id))
+                    case "profile":
+                        path.append(AquaRoute.profile)
+                    default:
+                        break
+                    }
                 }
             }
             .sheet(isPresented: $showRemind) {
@@ -118,30 +137,24 @@ struct HomeView: View {
 
     private var header: some View {
         HStack {
-            HStack(spacing: 8) {
-                ZStack {
-                    Circle().fill(Aqua.avatar)
-                    Image(systemName: "person.crop.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundStyle(Aqua.avatarIcon)
-                }
-                .frame(width: 30, height: 30)
-                Text(store.name).font(.system(size: 13))
+            Button {
+                path.append(AquaRoute.profile)
+            } label: {
+                ProfileChip(name: store.displayName, image: store.avatarImage)
             }
-            .padding(6)
-            .padding(.trailing, 8)
-            .background(Aqua.panel.opacity(0.65), in: Capsule())
+            .buttonStyle(AquaPressStyle())
+            .accessibilityLabel("Open profile")
             Spacer()
             if #available(iOS 26, *) {
                 GlassEffectContainer(spacing: 8) {
                     HStack(spacing: 8) {
-                        CircleIconButton(symbol: "magnifyingglass") { tab = .rituals }
+                        CircleIconButton(symbol: "calendar") { tab = .rituals }
                         CircleIconButton(symbol: "bell") { showNotice = true }
                     }
                 }
             } else {
                 HStack(spacing: 8) {
-                    CircleIconButton(symbol: "magnifyingglass") { tab = .rituals }
+                    CircleIconButton(symbol: "calendar") { tab = .rituals }
                     CircleIconButton(symbol: "bell") { showNotice = true }
                 }
             }
@@ -210,55 +223,50 @@ struct HomeView: View {
     private var controls: some View {
         HStack(spacing: 8) {
             Menu {
+                ForEach([1500, 2000, 2500, 3000], id: \.self) { ml in
+                    Button(String(format: "%.1f L", Double(ml) / 1000)) {
+                        withAnimation(motion) { store.setGoalML(ml) }
+                    }
+                }
+            } label: {
+                controlCard(title: "Goal", value: "\(store.litersGoal) L")
+            }
+            Menu {
                 ForEach([150, 250, 330, 500], id: \.self) { size in
                     Button("\(size) ml glass") {
                         withAnimation(motion) { store.setGlassSize(size) }
                     }
                 }
             } label: {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Glass").foregroundStyle(Aqua.muted).font(.system(size: 13))
-                        HStack(spacing: 7) {
-                            Image(systemName: "cup.and.saucer")
-                            Text("\(store.glassML)")
-                                .foregroundStyle(Aqua.muted)
-                                .contentTransition(.numericText())
-                            Text("ml").foregroundStyle(Aqua.muted)
-                        }
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.up.chevron.down").font(.system(size: 9)).foregroundStyle(Aqua.muted)
-                }
-                .padding(14)
-                .frame(maxWidth: .infinity)
-                .frame(height: 60)
-                .aquaCard()
+                controlCard(title: "Glass", value: "\(store.glassML) ml")
             }
             Button { showRemind = true } label: {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Remind").font(.system(size: 13))
-                        Text("Every \(store.reminderHours)h").font(.system(size: 15))
-                    }
-                    Spacer()
-                    Image(systemName: "bell").font(.system(size: 12))
-                }
-                .foregroundStyle(Aqua.muted)
-                .padding(14)
-                .frame(maxWidth: .infinity)
-                .frame(height: 60)
-                .aquaCard()
+                controlCard(title: "Remind", value: "Every \(store.reminderHours)h")
             }
             .buttonStyle(AquaPressStyle())
         }
     }
 
+    private func controlCard(title: String, value: String) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).foregroundStyle(Aqua.muted).font(.system(size: 13))
+                Text(value).font(.system(size: 15))
+            }
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(Aqua.muted)
+        .padding(12)
+        .frame(maxWidth: .infinity)
+        .frame(height: 60)
+        .aquaCard()
+    }
+
     private var headline: String {
         switch mode {
-        case "Rituals": return "Hi Maya! Keep the\nstreak alive?"
-        case "Streaks": return "Hi Maya! Look at\nyour run!"
-        default: return "Hi Maya! Ready to\nhydrate?"
+        case "Rituals": return "Hi \(store.firstName)! Keep the\nstreak alive?"
+        case "Streaks": return "Hi \(store.firstName)! Look at\nyour run!"
+        default: return "Hi \(store.firstName)! Ready to\nhydrate?"
         }
     }
 

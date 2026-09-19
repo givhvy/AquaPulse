@@ -13,6 +13,13 @@ enum Aqua {
     static let avatarIcon = Color(red: 0.64, green: 0.44, blue: 0.3)
 }
 
+enum AquaLegal {
+    static let origin = "https://aquapulse-tau.vercel.app"
+    static let privacy = URL(string: "\(origin)/privacy")!
+    static let terms = URL(string: "\(origin)/terms")!
+    static let support = URL(string: "\(origin)/support")!
+}
+
 enum AquaMotion {
     static let ui = Animation.spring(response: 0.38, dampingFraction: 0.9)
     static let snappy = Animation.spring(response: 0.28, dampingFraction: 0.82)
@@ -26,6 +33,48 @@ enum MainTab: Hashable {
 
 enum AquaRoute: Hashable {
     case glasses(UUID)
+    case profile
+}
+
+struct ProfileChip: View {
+    let name: String
+    var image: UIImage?
+    var compact = true
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ProfileAvatar(image: image, size: compact ? 30 : 40, symbolSize: compact ? 28 : 36)
+            Text(name.isEmpty ? "You" : name)
+                .font(.system(size: compact ? 13 : 15))
+                .lineLimit(1)
+        }
+        .padding(compact ? 6 : 10)
+        .padding(.trailing, compact ? 8 : 12)
+        .background(Aqua.panel.opacity(0.65), in: Capsule())
+    }
+}
+
+struct ProfileAvatar: View {
+    var image: UIImage?
+    var size: CGFloat = 30
+    var symbolSize: CGFloat = 28
+
+    var body: some View {
+        ZStack {
+            Circle().fill(Aqua.avatar)
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Image(systemName: "person.crop.circle.fill")
+                    .font(.system(size: symbolSize))
+                    .foregroundStyle(Aqua.avatarIcon)
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(Circle())
+    }
 }
 
 struct GlowButton: ButtonStyle {
