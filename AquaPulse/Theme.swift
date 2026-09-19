@@ -13,6 +13,13 @@ enum Aqua {
     static let avatarIcon = Color(red: 0.64, green: 0.44, blue: 0.3)
 }
 
+enum AquaMotion {
+    static let ui = Animation.spring(response: 0.38, dampingFraction: 0.9)
+    static let snappy = Animation.spring(response: 0.28, dampingFraction: 0.82)
+    static let bounce = Animation.spring(response: 0.44, dampingFraction: 0.68)
+    static let press = Animation.spring(response: 0.22, dampingFraction: 0.72)
+}
+
 struct GlowButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -38,7 +45,18 @@ struct GlowButton: ButtonStyle {
                     lineWidth: 0.8
                 )
             )
-            .opacity(configuration.isPressed ? 0.7 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .opacity(configuration.isPressed ? 0.82 : 1)
+            .animation(AquaMotion.press, value: configuration.isPressed)
+    }
+}
+
+struct AquaPressStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.975 : 1)
+            .opacity(configuration.isPressed ? 0.92 : 1)
+            .animation(AquaMotion.press, value: configuration.isPressed)
     }
 }
 
@@ -87,7 +105,25 @@ struct CircleIconButton: View {
                     )
                 )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(AquaPressStyle())
+    }
+}
+
+struct OrbitingDrop: View {
+    var reduceMotion = false
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: reduceMotion ? 10 : 1 / 30, paused: reduceMotion)) { timeline in
+            let t = reduceMotion ? 0.5 : (sin(timeline.date.timeIntervalSinceReferenceDate * 1.35) + 1) / 2
+            Image(systemName: "drop.fill")
+                .font(.system(size: 10))
+                .foregroundStyle(Aqua.mint)
+                .frame(width: 22, height: 22)
+                .background(Aqua.tealFill, in: Circle())
+                .overlay(Circle().stroke(Aqua.mint.opacity(0.24)))
+                .offset(x: (t - 0.5) * 54, y: -sin(t * .pi) * 11)
+                .shadow(color: Aqua.mint.opacity(reduceMotion ? 0 : 0.35), radius: 6)
+        }
     }
 }
 

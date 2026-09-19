@@ -15,6 +15,8 @@ struct AquaPulseApp: App {
 
 struct AquaRoot: View {
     @Environment(AquaStore.self) private var store
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var pills
     @State private var screen: String = {
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: "-screen"), args.indices.contains(i + 1) { return args[i + 1] }
@@ -30,26 +32,47 @@ struct AquaRoot: View {
     @State private var activeRitual: Ritual?
     @State private var selected: Set<Int> = []
     @State private var swapped = false
+    @State private var reverse = false
+    @State private var appeared = false
+
+    private var motion: Animation { reduceMotion ? .easeInOut(duration: 0.2) : AquaMotion.ui }
 
     var body: some View {
         GeometryReader { proxy in
-            let scale = min(proxy.size.width / 353, proxy.size.height / 687)
+            let scale = proxy.size.width / 353
+            let designHeight = proxy.size.height / scale
+            let bottomSafe = max(proxy.safeAreaInsets.bottom / scale, 8)
             ZStack(alignment: .top) {
                 LinearGradient(colors: [Aqua.bgTop, Aqua.bgMid, Aqua.bgBottom], startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea()
-                Group {
-                    if screen == "rituals" { rituals }
-                    else if screen == "week" { week }
-                    else if screen == "glasses" { glasses }
-                    else { home }
+                ZStack(alignment: .bottom) {
+                    Group {
+                        if screen == "rituals" { rituals }
+                        else if screen == "week" { week }
+                        else if screen == "glasses" { glasses }
+                        else { home }
+                    }
+                    .frame(width: 353, height: designHeight, alignment: .top)
+                    .id(screen)
+                    .transition(screenTransition)
+                    if screen == "home" {
+                        tabBar.padding(.bottom, bottomSafe)
+                    }
                 }
-                .frame(width: 353, height: 687, alignment: .top)
+                .frame(width: 353, height: designHeight, alignment: .top)
                 .scaleEffect(scale, anchor: .top)
                 .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
+                .animation(motion, value: screen)
             }
         }
         .font(.system(size: 14, weight: .regular))
         .foregroundStyle(.white)
+        .onAppear {
+            if selected.isEmpty { selected = Set(0..<store.glassesDrunk) }
+            withAnimation(reduceMotion ? .easeOut(duration: 0.25) : AquaMotion.bounce) {
+                appeared = true
+            }
+        }
         .sheet(isPresented: $showRemind) {
             VStack(spacing: 24) {
                 Text("When should we nudge you?").font(.title2)
@@ -79,7 +102,7 @@ struct AquaRoot: View {
             Text(store.notificationsOn ? "Water and ritual pings are on." : "Turn on reminders to keep every consistency task alive.")
         }
         .alert("Logged", isPresented: $confirmed) {
-            Button("Back to home") { screen = "home" }
+            Button("Back to home") { go("home", back: true) }
         } message: {
             if let ritual = activeRitual {
                 Text("\(ritual.doneToday) of \(ritual.timesPerDay) for \(ritual.name). Streak \(ritual.streak) days.")
@@ -87,11 +110,35 @@ struct AquaRoot: View {
                 Text("\(store.glassesDrunk) glasses toward \(store.litersGoal) L today.")
             }
         }
-        .onAppear {
-            if selected.isEmpty {
-                selected = Set(0..<store.glassesDrunk)
-            }
+    }
+
+    private var screenTransition: AnyTransition {
+        .asymmetric(
+            insertion: .move(edge: reverse ? .leading : .trailing).combined(with: .opacity),
+            removal: .move(edge: reverse ? .trailing : .leading).combined(with: .opacity)
+        )
+    }
+
+    private func go(_ next: String, back: Bool = false) {
+        reverse = back || next == "home"
+        withAnimation(motion) {
+            screen = next
+            if next == "home" { tab = 0 }
+            if next == "rituals" { tab = 1 }
+            if next == "week" { tab = 2 }
         }
+    }
+
+    private var tabBar: some View {
+        HStack {
+            navIcon("house.fill", index: 0)
+            Spacer()
+            navIcon("calendar", index: 1)
+            Spacer()
+            navIcon("circle.grid.2x2", index: 2)
+        }
+        .padding(.horizontal, 59)
+        .frame(height: 44)
     }
 
     private var home: some View {
@@ -111,7 +158,7 @@ struct AquaRoot: View {
                 .padding(.trailing, 8)
                 .background(Aqua.panel.opacity(0.65), in: Capsule())
                 Spacer()
-                CircleIconButton(symbol: "magnifyingglass") { screen = "rituals" }
+                CircleIconButton(symbol: "magnifyingglass") { go("rituals") }
                 CircleIconButton(symbol: "bell") { showNotice = true }
             }
             .padding(.bottom, 18)
@@ -119,19 +166,27 @@ struct AquaRoot: View {
             Text(headline)
                 .font(.system(size: 30, weight: .light))
                 .lineSpacing(0)
+                .id(mode)
+                .contentTransition(.opacity)
                 .padding(.bottom, 21)
 
             HStack(spacing: 8) {
                 ForEach(["Daily", "Rituals", "Streaks"], id: \.self) { item in
                     Button {
-                        mode = item
+                        withAnimation(motion) { mode = item }
                     } label: {
                         Text(item)
                             .font(.system(size: 13))
                             .foregroundStyle(mode == item ? Color.black : .white)
                             .padding(.horizontal, 15)
                             .frame(height: 38)
-                            .background(mode == item ? Color.white : Color.clear, in: Capsule())
+                            .background {
+                                if mode == item {
+                                    Capsule()
+                                        .fill(Color.white)
+                                        .matchedGeometryEffect(id: "modePill", in: pills)
+                                }
+                            }
                             .overlay(Capsule().stroke(.white.opacity(mode == item ? 0 : 0.1)))
                     }
                     .buttonStyle(.plain)
@@ -148,9 +203,9 @@ struct AquaRoot: View {
                 .padding(14)
                 Button {
                     if mode == "Daily" {
-                        store.logGlass()
+                        withAnimation(AquaMotion.bounce) { store.logGlass() }
                     } else {
-                        swapped.toggle()
+                        withAnimation(AquaMotion.snappy) { swapped.toggle() }
                     }
                 } label: {
                     Image(systemName: mode == "Daily" ? "plus" : "arrow.up.arrow.down")
@@ -161,8 +216,10 @@ struct AquaRoot: View {
                             in: Circle()
                         )
                         .overlay(Circle().stroke(.white.opacity(0.26)))
+                        .rotationEffect(.degrees(swapped && mode != "Daily" ? 180 : 0))
+                        .symbolEffect(.bounce, value: store.drunkML)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(AquaPressStyle())
                 .padding(.trailing, 15)
             }
             .frame(height: 128)
@@ -172,7 +229,9 @@ struct AquaRoot: View {
             HStack(spacing: 8) {
                 Menu {
                     ForEach([150, 250, 330, 500], id: \.self) { size in
-                        Button("\(size) ml glass") { store.setGlassSize(size) }
+                        Button("\(size) ml glass") {
+                            withAnimation(motion) { store.setGlassSize(size) }
+                        }
                     }
                 } label: {
                     HStack {
@@ -181,6 +240,7 @@ struct AquaRoot: View {
                             HStack(spacing: 7) {
                                 Image(systemName: "cup.and.saucer")
                                 Text("\(store.glassML) ml").foregroundStyle(Aqua.muted)
+                                    .contentTransition(.numericText())
                             }
                         }
                         Spacer()
@@ -206,16 +266,16 @@ struct AquaRoot: View {
                     .frame(height: 60)
                     .aquaCard()
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(AquaPressStyle())
             }
             .padding(.bottom, 12)
 
             Button(ctaTitle) {
-                if mode == "Rituals" { screen = "rituals" }
-                else if mode == "Streaks" { screen = "week" }
+                if mode == "Rituals" { go("rituals") }
+                else if mode == "Streaks" { go("week") }
                 else {
                     selected = Set(0..<store.glassesDrunk)
-                    screen = "glasses"
+                    go("glasses")
                 }
             }
             .buttonStyle(GlowButton())
@@ -225,7 +285,7 @@ struct AquaRoot: View {
             Button {
                 activeRitual = store.bestStreak
                 selected = Set(0..<min(store.bestStreak.doneToday, 16))
-                screen = "glasses"
+                go("glasses")
             } label: {
                 journey(
                     leftTime: "07:00 AM",
@@ -234,28 +294,22 @@ struct AquaRoot: View {
                     rightTime: "09:00 PM",
                     rightCode: "\(store.litersGoal) L",
                     rightCity: store.bestStreak.name.uppercased(),
-                    duration: "\(store.bestStreak.streak) day streak"
+                    duration: "\(store.bestStreak.streak) day streak",
+                    animated: true
                 )
                 .padding(14)
                 .frame(height: 95)
                 .featuredCard()
             }
-            .buttonStyle(.plain)
+            .buttonStyle(AquaPressStyle())
 
-            Spacer(minLength: 12)
-            HStack {
-                navIcon("house.fill", index: 0)
-                Spacer()
-                navIcon("calendar", index: 1)
-                Spacer()
-                navIcon("circle.grid.2x2", index: 2)
-            }
-            .padding(.horizontal, 59)
-            .frame(height: 40)
+            Spacer(minLength: 8)
         }
         .padding(.horizontal, 15)
         .padding(.top, 10)
-        .padding(.bottom, 9)
+        .padding(.bottom, 58)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 16)
     }
 
     private var headline: String {
@@ -293,14 +347,18 @@ struct AquaRoot: View {
 
     private func navIcon(_ name: String, index: Int) -> some View {
         Button {
-            tab = index
-            if index == 0 { screen = "home" }
-            if index == 1 { screen = "rituals" }
-            if index == 2 { screen = "week" }
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            if index == 0 { go("home", back: screen != "home") }
+            if index == 1 { go("rituals", back: screen == "week" || screen == "glasses") }
+            if index == 2 { go("week") }
         } label: {
             Image(systemName: name)
                 .font(.system(size: 18, weight: .light))
                 .foregroundStyle(tab == index ? .white : Color(red: 0.75, green: 0.86, blue: 0.86))
+                .scaleEffect(tab == index ? 1.14 : 1)
+                .shadow(color: tab == index ? .white.opacity(0.35) : .clear, radius: 8)
+                .symbolEffect(.bounce, value: tab == index)
+                .animation(motion, value: tab)
         }
         .buttonStyle(.plain)
     }
@@ -309,8 +367,11 @@ struct AquaRoot: View {
         VStack(alignment: .leading, spacing: 7) {
             Text(title).font(.system(size: 13)).foregroundStyle(Aqua.muted.opacity(0.8))
             HStack(spacing: 8) {
-                Image(systemName: icon).font(.system(size: 13))
-                Text(name).font(.system(size: 15))
+                Image(systemName: icon).font(.system(size: 13)).symbolEffect(.bounce, value: name)
+                Text(name)
+                    .font(.system(size: 15))
+                    .contentTransition(.numericText())
+                    .animation(motion, value: name)
             }
         }
     }
@@ -318,7 +379,7 @@ struct AquaRoot: View {
     private var rituals: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                CircleIconButton(symbol: "arrow.left") { screen = "home"; tab = 0 }
+                CircleIconButton(symbol: "arrow.left") { go("home", back: true) }
                 Spacer()
                 VStack(spacing: 4) {
                     Text(Date().formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).year()))
@@ -341,18 +402,22 @@ struct AquaRoot: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 15) {
-                    ForEach(sortedRituals) { ritual in
+                    ForEach(Array(sortedRituals.enumerated()), id: \.element.id) { index, ritual in
                         ritualCard(ritual)
+                            .transition(.asymmetric(insertion: .move(edge: .bottom).combined(with: .opacity), removal: .opacity))
+                            .animation(motion.delay(Double(index) * 0.05), value: sorted)
                     }
                 }
-                .padding(.bottom, 65)
+                .padding(.bottom, 80)
             }
         }
         .padding(.horizontal, 15)
         .padding(.top, 10)
         .overlay(alignment: .bottom) {
             HStack(spacing: 8) {
-                Button { sorted.toggle() } label: {
+                Button {
+                    withAnimation(AquaMotion.snappy) { sorted.toggle() }
+                } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "arrow.up.arrow.down").font(.system(size: 12))
                         VStack(alignment: .leading, spacing: 0) {
@@ -365,16 +430,16 @@ struct AquaRoot: View {
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                     .overlay(RoundedRectangle(cornerRadius: 16).stroke(.white.opacity(0.09)))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(AquaPressStyle())
                 Button { showAdd = true } label: {
                     Image(systemName: "line.3.horizontal.decrease")
                         .frame(width: 45, height: 45)
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(.white.opacity(0.09)))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(AquaPressStyle())
             }
-            .padding(.bottom, 28)
+            .padding(.bottom, 24)
         }
     }
 
@@ -388,7 +453,7 @@ struct AquaRoot: View {
         Button {
             activeRitual = ritual
             selected = Set(0..<min(ritual.doneToday, 16))
-            screen = "glasses"
+            go("glasses")
         } label: {
             VStack(spacing: 0) {
                 HStack {
@@ -437,13 +502,13 @@ struct AquaRoot: View {
             .frame(height: 210)
             .aquaCard()
         }
-        .buttonStyle(.plain)
+        .buttonStyle(AquaPressStyle())
     }
 
     private var week: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                CircleIconButton(symbol: "arrow.left") { screen = "home"; tab = 0 }
+                CircleIconButton(symbol: "arrow.left") { go("home", back: true) }
                 Spacer()
                 Text("This week").font(.system(size: 15))
                 Spacer()
@@ -465,12 +530,13 @@ struct AquaRoot: View {
             .padding(.bottom, 12)
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 12) {
-                    ForEach(store.rituals) { ritual in
+                    ForEach(Array(store.rituals.enumerated()), id: \.element.id) { row, ritual in
                         HStack(spacing: 8) {
                             Image(systemName: ritual.symbol)
                                 .font(.system(size: 12))
                                 .frame(width: 38, height: 38)
                                 .background(Aqua.panel.opacity(0.7), in: Circle())
+                                .symbolEffect(.bounce, value: ritual.isComplete)
                             HStack(spacing: 6) {
                                 ForEach(0..<7, id: \.self) { day in
                                     let on = store.weekMarks[ritual.id.uuidString]?[day] ?? false
@@ -478,6 +544,8 @@ struct AquaRoot: View {
                                         .fill(on ? Aqua.tealFill : Color.white.opacity(0.03))
                                         .overlay(Circle().stroke(on ? Aqua.mint.opacity(0.7) : Aqua.muted.opacity(0.35), lineWidth: 0.6))
                                         .frame(width: 28, height: 28)
+                                        .scaleEffect(on ? 1 : 0.88)
+                                        .animation(motion.delay(Double(row) * 0.04 + Double(day) * 0.03), value: on)
                                         .frame(maxWidth: .infinity)
                                 }
                             }
@@ -486,7 +554,7 @@ struct AquaRoot: View {
                         .aquaCard()
                     }
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, 70)
             }
         }
         .padding(.horizontal, 15)
@@ -500,7 +568,7 @@ struct AquaRoot: View {
         let goal = isWater ? store.glassesGoal : ritual.timesPerDay
         return VStack(alignment: .leading, spacing: 0) {
             HStack {
-                CircleIconButton(symbol: "arrow.left") { screen = "rituals" }
+                CircleIconButton(symbol: "arrow.left") { go("rituals", back: true) }
                 Spacer()
                 Text(ritual.name).font(.system(size: 15))
                 Spacer()
@@ -536,16 +604,18 @@ struct AquaRoot: View {
                             Button {
                                 guard inPlan else { return }
                                 if available || selected.count >= goal {
-                                    if selected.contains(index) {
-                                        selected.remove(index)
-                                    } else {
-                                        selected.insert(index)
-                                    }
-                                    if isWater {
-                                        store.setGlasses(selected.count)
-                                    } else {
-                                        store.setDone(ritual.id, count: selected.count)
-                                        activeRitual = store.rituals.first { $0.id == ritual.id }
+                                    withAnimation(AquaMotion.bounce) {
+                                        if selected.contains(index) {
+                                            selected.remove(index)
+                                        } else {
+                                            selected.insert(index)
+                                        }
+                                        if isWater {
+                                            store.setGlasses(selected.count)
+                                        } else {
+                                            store.setDone(ritual.id, count: selected.count)
+                                            activeRitual = store.rituals.first { $0.id == ritual.id }
+                                        }
                                     }
                                 }
                             } label: {
@@ -570,6 +640,8 @@ struct AquaRoot: View {
                     Text(isWater ? "\(store.litersDrunk) L" : "\(selected.count)/\(goal)")
                         .font(.system(size: 24))
                         .foregroundStyle(Aqua.mint)
+                        .contentTransition(.numericText())
+                        .animation(AquaMotion.snappy, value: selected.count)
                     Text(isWater ? "Daily  ·  \(store.glassML)ml  ·  \(selected.count) Glasses" : "\(ritual.name)  ·  \(selected.count) check-ins")
                         .font(.system(size: 13))
                 }
@@ -580,7 +652,7 @@ struct AquaRoot: View {
                     .disabled(selected.isEmpty)
             }
             .padding(15)
-            .padding(.bottom, 29)
+            .padding(.bottom, 32)
             .background(
                 RoundedRectangle(cornerRadius: 17)
                     .fill(.white.opacity(0.035))
@@ -626,14 +698,20 @@ struct AquaRoot: View {
                     Image(systemName: "checkmark")
                         .font(.system(size: 21, weight: .light))
                         .foregroundStyle(Aqua.mint.opacity(0.75))
+                        .symbolEffect(.bounce, value: on)
+                        .transition(.scale.combined(with: .opacity))
                 } else if available {
                     Image(systemName: "drop")
                         .font(.system(size: 11, weight: .light))
                         .foregroundStyle(Aqua.mint.opacity(0.45))
+                        .transition(.opacity)
                 }
             }
             .frame(width: 54, height: 68)
+            .scaleEffect(on ? 1.04 : 1)
+            .shadow(color: on ? Aqua.mint.opacity(0.35) : .clear, radius: on ? 8 : 0)
             .opacity(inPlan ? 1 : 0.35)
+            .animation(AquaMotion.bounce, value: on)
     }
 
     private func legend(_ title: String, filled: Bool) -> some View {
@@ -649,7 +727,7 @@ struct AquaRoot: View {
         .overlay(Capsule().stroke(.white.opacity(0.10)))
     }
 
-    private func journey(leftTime: String, leftCode: String, leftCity: String, rightTime: String, rightCode: String, rightCity: String, duration: String) -> some View {
+    private func journey(leftTime: String, leftCode: String, leftCity: String, rightTime: String, rightCode: String, rightCity: String, duration: String, animated: Bool = false) -> some View {
         HStack(alignment: .center, spacing: 4) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(leftTime).font(.system(size: 11)).foregroundStyle(Aqua.muted)
@@ -663,12 +741,16 @@ struct AquaRoot: View {
                         .stroke(Aqua.muted.opacity(0.85), style: StrokeStyle(lineWidth: 0.8, dash: [1, 3]))
                         .frame(width: 118, height: 26)
                         .offset(y: 9)
-                    Image(systemName: "drop.fill")
-                        .font(.system(size: 10))
-                        .foregroundStyle(Aqua.mint)
-                        .frame(width: 22, height: 22)
-                        .background(Aqua.tealFill, in: Circle())
-                        .overlay(Circle().stroke(Aqua.mint.opacity(0.24)))
+                    if animated && !reduceMotion {
+                        OrbitingDrop()
+                    } else {
+                        Image(systemName: "drop.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Aqua.mint)
+                            .frame(width: 22, height: 22)
+                            .background(Aqua.tealFill, in: Circle())
+                            .overlay(Circle().stroke(Aqua.mint.opacity(0.24)))
+                    }
                 }
                 .frame(height: 34)
                 Text(duration).font(.system(size: 8)).foregroundStyle(Aqua.muted)
@@ -702,13 +784,14 @@ struct AddRitualSheet: View {
             HStack(spacing: 8) {
                 ForEach(symbols, id: \.self) { item in
                     Button {
-                        symbol = item
+                        withAnimation(AquaMotion.snappy) { symbol = item }
                     } label: {
                         Image(systemName: item)
                             .font(.system(size: 13))
                             .frame(width: 36, height: 36)
                             .background(symbol == item ? Aqua.mint.opacity(0.25) : Aqua.panel.opacity(0.7), in: Circle())
                             .overlay(Circle().stroke(symbol == item ? Aqua.mint : .white.opacity(0.1)))
+                            .scaleEffect(symbol == item ? 1.08 : 1)
                     }
                     .buttonStyle(.plain)
                 }
