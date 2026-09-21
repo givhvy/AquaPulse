@@ -7,7 +7,7 @@ struct OnboardingView: View {
     @State private var name = ""
     @State private var goalML = 2000
     @State private var glassML = 250
-    @State private var extraKinds: Set<String> = []
+    @State private var extraKinds: Set<String> = ["youtube"]
     @State private var signInError: String?
 
     private let goals = [1500, 2000, 2500, 3000]

@@ -8,33 +8,89 @@
 
 /* Begin PBXBuildFile section */
 		028BDA6287F1CAA66556C265 /* AquaPulseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5FD70213AC73A561084FCA7 /* AquaPulseApp.swift */; };
+		079A7555F7FEC80820F4B579 /* AquaPulseWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B3BEF94463B8C68A8B28DB /* AquaPulseWidget.swift */; };
+		0B196A6A4C810D6F2948F314 /* AquaWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7C3D9DFEDD07606AE3E731 /* AquaWidgetViews.swift */; };
+		11DB9556DEEC2718F015BE0F /* AquaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D966FE4D07BCE23E802E9E /* AquaModels.swift */; };
 		25E4881A4B2FB8B1CDDAE3F4 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6660542B49E4CB73CE3DC5BC /* OnboardingView.swift */; };
+		3329CADDDD73ABE671643B41 /* AquaPulseWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816E67009CDE3BF17399529B /* AquaPulseWidgetsBundle.swift */; };
 		39C8D7DD5C3E3E4F7F0033FB /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E34F46960A7CFE700B071E2 /* WeekView.swift */; };
 		3A06D4E72CE0FD7989824EA0 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5CF093EE2889D152645BBE /* ProfileView.swift */; };
+		3E2051444DC260BE08D3C4B1 /* AquaIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A22B54B8FBA5AE6FB98FF /* AquaIntents.swift */; };
 		483932E92FEFC95B3849757E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD337E24AF014703713A64BB /* Theme.swift */; };
 		4DE841B4A9DBDA6F071690E2 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BCD4ADEF4563FF64F1CF713 /* HomeView.swift */; };
 		4F1A84EC2D2181FF14EB432B /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41556E20CB7D177F79D6AF94 /* Store.swift */; };
+		6A96381AC775A88862B94D5C /* AquaNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7520EFF602544DBB3D56E7E6 /* AquaNotifications.swift */; };
+		6C6DFD8083E2638C321DDDA7 /* AquaShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B265506113F38E6AFD5DF3E /* AquaShortcuts.swift */; };
+		6E66591AD643889BB18C8190 /* AquaWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7C3D9DFEDD07606AE3E731 /* AquaWidgetViews.swift */; };
+		73B687B7278363729AE643FC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DB5895F552A1357A7D5B84AB /* PrivacyInfo.xcprivacy */; };
+		7BBDE99C3D0E181305103A48 /* AquaPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FBF8E1B3EDEB96D56B4C505 /* AquaPalette.swift */; };
+		7EDA6F00DA010868AB13E288 /* AquaPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C043E8DA3468EA886FE4598E /* AquaPersistence.swift */; };
+		8454B80B4989F2C54B0808FE /* AquaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D966FE4D07BCE23E802E9E /* AquaModels.swift */; };
 		8C9EBCF6825342C73A89376A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8791E93B4B97ED452D39FAC0 /* PrivacyInfo.xcprivacy */; };
+		8FCB31E8653CC5283688CF95 /* AquaIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A22B54B8FBA5AE6FB98FF /* AquaIntents.swift */; };
 		907166258FADD4D076AADC18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 300CF038A1F4A0BA2997811B /* Assets.xcassets */; };
 		A19101FB97A28F920422CBFD /* RitualsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C93AA106F4EF936E6D9E4B /* RitualsView.swift */; };
 		A21B3E2482964E5B7A4936F0 /* AddRitualSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEAF68C5EE39ACA95FEF37D /* AddRitualSheet.swift */; };
+		AFBB27C890F13D8D875EE028 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E4821F6C2C00D235BE92D67 /* Assets.xcassets */; };
+		BA29E2A1CD585AA5EAE300BC /* AquaPulseWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AD768B0DC159E4CECAF23DE1 /* AquaPulseWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BB246AB2B231E3A0E7BAE615 /* GlassesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF89FB9A6A3FD675404E4BE0 /* GlassesView.swift */; };
+		BE9477F0401995D4E291649F /* WidgetGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A8882433990E8F2D4F2CDA /* WidgetGallery.swift */; };
+		E72E898CA632A39C06D36101 /* AquaPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C043E8DA3468EA886FE4598E /* AquaPersistence.swift */; };
+		EA63A10FA0A5E59CDCA1B806 /* AquaNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7520EFF602544DBB3D56E7E6 /* AquaNotifications.swift */; };
+		FBA377A1F07BB9D9ADDE5F14 /* AquaPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FBF8E1B3EDEB96D56B4C505 /* AquaPalette.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		6D8497965B5849AB8FC73E4E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 044B428CAD84187D81F2FDC9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 76B997897E2AD7E9614BAE1C;
+			remoteInfo = AquaPulseWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C6D4E920FDE1F35E7F3AD7F3 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BA29E2A1CD585AA5EAE300BC /* AquaPulseWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		01A8882433990E8F2D4F2CDA /* WidgetGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGallery.swift; sourceTree = "<group>"; };
 		0CEAF68C5EE39ACA95FEF37D /* AddRitualSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRitualSheet.swift; sourceTree = "<group>"; };
 		2BCD4ADEF4563FF64F1CF713 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		2F7C3D9DFEDD07606AE3E731 /* AquaWidgetViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaWidgetViews.swift; sourceTree = "<group>"; };
 		300CF038A1F4A0BA2997811B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		34C93AA106F4EF936E6D9E4B /* RitualsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualsView.swift; sourceTree = "<group>"; };
 		41556E20CB7D177F79D6AF94 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
+		5B265506113F38E6AFD5DF3E /* AquaShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaShortcuts.swift; sourceTree = "<group>"; };
 		5E34F46960A7CFE700B071E2 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
+		5F4A22B54B8FBA5AE6FB98FF /* AquaIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaIntents.swift; sourceTree = "<group>"; };
 		6660542B49E4CB73CE3DC5BC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		7520EFF602544DBB3D56E7E6 /* AquaNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaNotifications.swift; sourceTree = "<group>"; };
+		7E4821F6C2C00D235BE92D67 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7F5CF093EE2889D152645BBE /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		7FBF8E1B3EDEB96D56B4C505 /* AquaPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaPalette.swift; sourceTree = "<group>"; };
+		816E67009CDE3BF17399529B /* AquaPulseWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaPulseWidgetsBundle.swift; sourceTree = "<group>"; };
 		8791E93B4B97ED452D39FAC0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		87B3BEF94463B8C68A8B28DB /* AquaPulseWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaPulseWidget.swift; sourceTree = "<group>"; };
 		A111FFC4B0B90146E4A45A2D /* AquaPulse.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AquaPulse.entitlements; sourceTree = "<group>"; };
+		AD768B0DC159E4CECAF23DE1 /* AquaPulseWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = AquaPulseWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B235A21300042A51AA73216D /* AquaPulse.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AquaPulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C043E8DA3468EA886FE4598E /* AquaPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaPersistence.swift; sourceTree = "<group>"; };
 		CD337E24AF014703713A64BB /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		CF89FB9A6A3FD675404E4BE0 /* GlassesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassesView.swift; sourceTree = "<group>"; };
+		D3D966FE4D07BCE23E802E9E /* AquaModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaModels.swift; sourceTree = "<group>"; };
+		DB5895F552A1357A7D5B84AB /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E5FD70213AC73A561084FCA7 /* AquaPulseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AquaPulseApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -45,6 +101,7 @@
 				0CEAF68C5EE39ACA95FEF37D /* AddRitualSheet.swift */,
 				A111FFC4B0B90146E4A45A2D /* AquaPulse.entitlements */,
 				E5FD70213AC73A561084FCA7 /* AquaPulseApp.swift */,
+				5B265506113F38E6AFD5DF3E /* AquaShortcuts.swift */,
 				300CF038A1F4A0BA2997811B /* Assets.xcassets */,
 				CF89FB9A6A3FD675404E4BE0 /* GlassesView.swift */,
 				2BCD4ADEF4563FF64F1CF713 /* HomeView.swift */,
@@ -55,6 +112,7 @@
 				41556E20CB7D177F79D6AF94 /* Store.swift */,
 				CD337E24AF014703713A64BB /* Theme.swift */,
 				5E34F46960A7CFE700B071E2 /* WeekView.swift */,
+				01A8882433990E8F2D4F2CDA /* WidgetGallery.swift */,
 			);
 			path = AquaPulse;
 			sourceTree = "<group>";
@@ -63,14 +121,41 @@
 			isa = PBXGroup;
 			children = (
 				B235A21300042A51AA73216D /* AquaPulse.app */,
+				AD768B0DC159E4CECAF23DE1 /* AquaPulseWidgets.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		535751CD7E286E2E461FA427 /* AquaPulseShared */ = {
+			isa = PBXGroup;
+			children = (
+				5F4A22B54B8FBA5AE6FB98FF /* AquaIntents.swift */,
+				D3D966FE4D07BCE23E802E9E /* AquaModels.swift */,
+				7520EFF602544DBB3D56E7E6 /* AquaNotifications.swift */,
+				7FBF8E1B3EDEB96D56B4C505 /* AquaPalette.swift */,
+				C043E8DA3468EA886FE4598E /* AquaPersistence.swift */,
+				2F7C3D9DFEDD07606AE3E731 /* AquaWidgetViews.swift */,
+			);
+			path = AquaPulseShared;
+			sourceTree = "<group>";
+		};
+		8EB9F059970BD895C18720BB /* AquaPulseWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				87B3BEF94463B8C68A8B28DB /* AquaPulseWidget.swift */,
+				816E67009CDE3BF17399529B /* AquaPulseWidgetsBundle.swift */,
+				7E4821F6C2C00D235BE92D67 /* Assets.xcassets */,
+				DB5895F552A1357A7D5B84AB /* PrivacyInfo.xcprivacy */,
+			);
+			path = AquaPulseWidgets;
 			sourceTree = "<group>";
 		};
 		D1311AEB6EA186579D467AE2 = {
 			isa = PBXGroup;
 			children = (
 				1735C9CC551F7AC3E7D65183 /* AquaPulse */,
+				535751CD7E286E2E461FA427 /* AquaPulseShared */,
+				8EB9F059970BD895C18720BB /* AquaPulseWidgets */,
 				208626F81E01C042B928CE61 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,10 +169,12 @@
 			buildPhases = (
 				97A08E63594F42C82BC3CEB1 /* Sources */,
 				AC65EA58A7A9F90B27AA6E82 /* Resources */,
+				C6D4E920FDE1F35E7F3AD7F3 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C402AB41CDF3FCED2B4C6214 /* PBXTargetDependency */,
 			);
 			name = AquaPulse;
 			packageProductDependencies = (
@@ -95,6 +182,24 @@
 			productName = AquaPulse;
 			productReference = B235A21300042A51AA73216D /* AquaPulse.app */;
 			productType = "com.apple.product-type.application";
+		};
+		76B997897E2AD7E9614BAE1C /* AquaPulseWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC684901A1669773175BDB90 /* Build configuration list for PBXNativeTarget "AquaPulseWidgets" */;
+			buildPhases = (
+				5D3AB1FD0E66FFD64966FA51 /* Sources */,
+				487097950EDA8D1CFE51AEC9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AquaPulseWidgets;
+			packageProductDependencies = (
+			);
+			productName = AquaPulseWidgets;
+			productReference = AD768B0DC159E4CECAF23DE1 /* AquaPulseWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -107,7 +212,9 @@
 				TargetAttributes = {
 					51EE1435C2B08FA56BD8E803 = {
 						DevelopmentTeam = 337LP258Y2;
-						ProvisioningStyle = Automatic;
+					};
+					76B997897E2AD7E9614BAE1C = {
+						DevelopmentTeam = 337LP258Y2;
 					};
 				};
 			};
@@ -126,11 +233,21 @@
 			projectRoot = "";
 			targets = (
 				51EE1435C2B08FA56BD8E803 /* AquaPulse */,
+				76B997897E2AD7E9614BAE1C /* AquaPulseWidgets */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		487097950EDA8D1CFE51AEC9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AFBB27C890F13D8D875EE028 /* Assets.xcassets in Resources */,
+				73B687B7278363729AE643FC /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AC65EA58A7A9F90B27AA6E82 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,12 +260,34 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5D3AB1FD0E66FFD64966FA51 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8FCB31E8653CC5283688CF95 /* AquaIntents.swift in Sources */,
+				11DB9556DEEC2718F015BE0F /* AquaModels.swift in Sources */,
+				EA63A10FA0A5E59CDCA1B806 /* AquaNotifications.swift in Sources */,
+				FBA377A1F07BB9D9ADDE5F14 /* AquaPalette.swift in Sources */,
+				7EDA6F00DA010868AB13E288 /* AquaPersistence.swift in Sources */,
+				079A7555F7FEC80820F4B579 /* AquaPulseWidget.swift in Sources */,
+				3329CADDDD73ABE671643B41 /* AquaPulseWidgetsBundle.swift in Sources */,
+				6E66591AD643889BB18C8190 /* AquaWidgetViews.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97A08E63594F42C82BC3CEB1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				A21B3E2482964E5B7A4936F0 /* AddRitualSheet.swift in Sources */,
+				3E2051444DC260BE08D3C4B1 /* AquaIntents.swift in Sources */,
+				8454B80B4989F2C54B0808FE /* AquaModels.swift in Sources */,
+				6A96381AC775A88862B94D5C /* AquaNotifications.swift in Sources */,
+				7BBDE99C3D0E181305103A48 /* AquaPalette.swift in Sources */,
+				E72E898CA632A39C06D36101 /* AquaPersistence.swift in Sources */,
 				028BDA6287F1CAA66556C265 /* AquaPulseApp.swift in Sources */,
+				6C6DFD8083E2638C321DDDA7 /* AquaShortcuts.swift in Sources */,
+				0B196A6A4C810D6F2948F314 /* AquaWidgetViews.swift in Sources */,
 				BB246AB2B231E3A0E7BAE615 /* GlassesView.swift in Sources */,
 				4DE841B4A9DBDA6F071690E2 /* HomeView.swift in Sources */,
 				25E4881A4B2FB8B1CDDAE3F4 /* OnboardingView.swift in Sources */,
@@ -157,10 +296,19 @@
 				4F1A84EC2D2181FF14EB432B /* Store.swift in Sources */,
 				483932E92FEFC95B3849757E /* Theme.swift in Sources */,
 				39C8D7DD5C3E3E4F7F0033FB /* WeekView.swift in Sources */,
+				BE9477F0401995D4E291649F /* WidgetGallery.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C402AB41CDF3FCED2B4C6214 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 76B997897E2AD7E9614BAE1C /* AquaPulseWidgets */;
+			targetProxy = 6D8497965B5849AB8FC73E4E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		04C888E2E5E98774126C411D /* Debug */ = {
@@ -198,7 +346,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 337LP258Y2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -222,6 +370,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -245,8 +394,9 @@
 				CODE_SIGN_ENTITLEMENTS = AquaPulse/AquaPulse.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 337LP258Y2;
+				INFOPLIST_FILE = AquaPulse/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "AquaPulse sends hydration and ritual reminders on this iPhone. Reminders are optional.";
@@ -258,9 +408,53 @@
 				PRODUCT_BUNDLE_IDENTIFIER = global.huy.AquaPulse;
 				PRODUCT_NAME = AquaPulse;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
+		};
+		4106A02A2C1B4762A5F1E189 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AquaPulseWidgets/AquaPulseWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = 337LP258Y2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AquaPulseWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AquaPulse;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = global.huy.AquaPulse.widget;
+				PRODUCT_NAME = AquaPulseWidgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		7533D0FAA50ED2921CE314E4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AquaPulseWidgets/AquaPulseWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = 337LP258Y2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AquaPulseWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AquaPulse;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = global.huy.AquaPulse.widget;
+				PRODUCT_NAME = AquaPulseWidgets;
+				PROVISIONING_PROFILE_SPECIFIER = "AquaPulse Widget App Store 3";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
 		};
 		B3B605EC326F4325825A49B1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -297,7 +491,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 337LP258Y2;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -315,6 +509,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -335,10 +530,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AquaPulse/AquaPulse.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 337LP258Y2;
+				INFOPLIST_FILE = AquaPulse/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "AquaPulse sends hydration and ritual reminders on this iPhone. Reminders are optional.";
@@ -349,8 +545,9 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = global.huy.AquaPulse;
 				PRODUCT_NAME = AquaPulse;
+				PROVISIONING_PROFILE_SPECIFIER = "AquaPulse App Store 3";
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -371,6 +568,15 @@
 			buildConfigurations = (
 				2E336E09EA0F2564FE7070D5 /* Debug */,
 				F8EA80CECB3E0F98E26D382A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FC684901A1669773175BDB90 /* Build configuration list for PBXNativeTarget "AquaPulseWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4106A02A2C1B4762A5F1E189 /* Debug */,
+				7533D0FAA50ED2921CE314E4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

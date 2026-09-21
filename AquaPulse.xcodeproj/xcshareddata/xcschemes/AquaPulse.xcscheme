@@ -21,6 +21,20 @@
                ReferencedContainer = "container:AquaPulse.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "76B997897E2AD7E9614BAE1C"
+               BuildableName = "AquaPulseWidgets.appex"
+               BlueprintName = "AquaPulseWidgets"
+               ReferencedContainer = "container:AquaPulse.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

@@ -7,7 +7,7 @@ struct AddRitualSheet: View {
     @State private var times = 1
     @State private var hour = 9
     @State private var symbol = "star.fill"
-    private let symbols = ["star.fill", "heart.fill", "leaf.fill", "dumbbell.fill", "brain.head.profile", "fork.knife", "music.note", "paintbrush.fill"]
+    private let symbols = ["star.fill", "heart.fill", "leaf.fill", "dumbbell.fill", "brain.head.profile", "fork.knife", "music.note", "paintbrush.fill", "play.rectangle.fill"]
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
 

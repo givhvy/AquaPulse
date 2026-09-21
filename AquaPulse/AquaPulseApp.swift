@@ -3,21 +3,47 @@ import SwiftUI
 @main
 struct AquaPulseApp: App {
     @State private var store = AquaStore()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
             Group {
+                #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("-widgets") {
+                    WidgetGalleryView()
+                } else if store.didOnboard {
+                    AquaRoot()
+                } else {
+                    OnboardingView()
+                }
+                #else
                 if store.didOnboard {
                     AquaRoot()
                 } else {
                     OnboardingView()
                 }
+                #endif
             }
             .environment(store)
             .preferredColorScheme(.dark)
-            #if DEBUG
-            .onAppear { applyDebugLaunchSeed(store) }
-            #endif
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    AquaNotifyCenter.bootstrap()
+                    store.reloadFromDisk()
+                }
+            }
+            .onAppear {
+                AquaNotifyCenter.bootstrap()
+                #if DEBUG
+                applyDebugLaunchSeed(store)
+                #endif
+            }
+            .onOpenURL { url in
+                store.reloadFromDisk()
+                if url.host == "log" {
+                    store.logGlass()
+                }
+            }
         }
     }
 }

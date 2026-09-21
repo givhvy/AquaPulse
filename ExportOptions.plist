@@ -4,7 +4,14 @@
   <key>method</key><string>app-store-connect</string>
   <key>destination</key><string>upload</string>
   <key>teamID</key><string>337LP258Y2</string>
-  <key>signingStyle</key><string>automatic</string>
+  <key>signingStyle</key><string>manual</string>
+  <key>provisioningProfiles</key>
+  <dict>
+    <key>global.huy.AquaPulse</key>
+    <string>AquaPulse App Store 3</string>
+    <key>global.huy.AquaPulse.widget</key>
+    <string>AquaPulse Widget App Store 3</string>
+  </dict>
   <key>uploadSymbols</key><true/>
   <key>manageAppVersionAndBuildNumberAutomatically</key><false/>
 </dict></plist>

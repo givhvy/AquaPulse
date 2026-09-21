@@ -15,7 +15,7 @@ struct WeekView: View {
                     Text("Consistency\nboard")
                         .font(.system(size: 30, weight: .light))
                         .padding(.bottom, 6)
-                    Text("Dots fill only on days you complete a ritual. Nothing is backfilled.")
+                    Text("Dots fill only on days you complete a ritual — water, YouTube upload, and anything else you add. Nothing is backfilled.")
                         .font(.system(size: 13))
                         .foregroundStyle(Aqua.muted)
                         .padding(.bottom, 14)
