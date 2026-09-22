@@ -57,9 +57,6 @@ final class AquaStore {
         syncWaterRitual()
         checkAppleCredential()
         startListeningForWidget()
-        if notificationsOn {
-            Task { await AquaNotifications.refresh(snapshot()) }
-        }
     }
 
     deinit {
@@ -294,7 +291,7 @@ final class AquaStore {
         let snap = snapshot()
         AquaPulseData.save(snap)
         WidgetCenter.shared.reloadAllTimelines()
-        Task { await AquaNotifications.refresh(snap) }
+        Task { await AquaNotifications.refresh(snap, clearDelivered: true) }
     }
 
     private func load() {

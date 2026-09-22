@@ -17,16 +17,39 @@ struct Ritual: Identifiable, Codable, Equatable, Hashable, Sendable {
     var remaining: Int { max(timesPerDay - doneToday, 0) }
     var isComplete: Bool { doneToday >= timesPerDay }
 
-    var reminderTitle: String { isYouTube ? "YouTube upload" : name }
+    var reminderTitle: String {
+        switch kind {
+        case "youtube": return "YouTube upload"
+        case "wavs": return "Wavs.com"
+        case "suno": return "Suno"
+        case "imagegen": return "Image generate"
+        default: return name
+        }
+    }
+
     var reminderBody: String {
-        if isYouTube {
+        switch kind {
+        case "youtube":
             return isComplete
                 ? "Uploaded today — \(streak) day streak."
                 : "Upload today to keep your YouTube streak going."
+        case "wavs":
+            return isComplete
+                ? "Wavs done today — \(streak) day streak."
+                : "Ship something on Wavs.com today to keep the streak."
+        case "suno":
+            return isComplete
+                ? "Suno done today — \(streak) day streak."
+                : "Generate a Suno track today to keep the streak."
+        case "imagegen":
+            return isComplete
+                ? "Image gen done today — \(streak) day streak."
+                : "Generate an image today to keep the streak."
+        default:
+            return isComplete
+                ? "Already done — keep the \(streak) day streak."
+                : "One check-in keeps this ritual alive."
         }
-        return isComplete
-            ? "Already done — keep the \(streak) day streak."
-            : "One check-in keeps this ritual alive."
     }
 
     static let empty = Ritual(
@@ -51,8 +74,13 @@ struct Ritual: Identifiable, Codable, Equatable, Hashable, Sendable {
         (UUID(uuidString: "11111111-1111-4111-8111-111111111116")!, "Sleep by 11", "moon.fill", "REST", "sleep", 1, 22, "purple"),
         (UUID(uuidString: "11111111-1111-4111-8111-111111111117")!, "Journal", "book.closed.fill", "INK", "journal", 1, 22, "orange"),
         (UUID(uuidString: "11111111-1111-4111-8111-111111111118")!, "No late caffeine", "cup.and.saucer.fill", "CAF", "caffeine", 1, 14, "red"),
-        (UUID(uuidString: "11111111-1111-4111-8111-111111111119")!, "Upload to YouTube", "play.rectangle.fill", "YT", "youtube", 1, 17, "red")
+        (UUID(uuidString: "11111111-1111-4111-8111-111111111119")!, "Upload to YouTube", "play.rectangle.fill", "YT", "youtube", 1, 17, "red"),
+        (UUID(uuidString: "11111111-1111-4111-8111-111111111120")!, "Upload to Wavs", "waveform", "WAVS", "wavs", 1, 16, "teal"),
+        (UUID(uuidString: "11111111-1111-4111-8111-111111111121")!, "Generate on Suno", "music.note", "SUNO", "suno", 1, 15, "purple"),
+        (UUID(uuidString: "11111111-1111-4111-8111-111111111122")!, "Generate an image", "photo.artframe", "IMG", "imagegen", 1, 18, "orange")
     ]
+
+    static let creatorKinds = ["youtube", "wavs", "suno", "imagegen"]
 
     static func fromCatalog(_ item: (id: UUID, name: String, symbol: String, logo: String, kind: String, times: Int, hour: Int, accent: String)) -> Ritual {
         Ritual(

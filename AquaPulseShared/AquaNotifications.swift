@@ -5,18 +5,23 @@ import WidgetKit
 enum AquaNotifications {
     static let waterCategory = "AQUA_WATER"
     static let logAction = "LOG_GLASS"
-    static let youtubeSeedKey = "aqua.seeded.youtube.v1"
+    static let creatorSeedKey = "aqua.seeded.creator.v2"
 
-    static func refresh(_ snap: AquaSnapshot) async {
+    static func refresh(_ snap: AquaSnapshot, clearDelivered: Bool = false) async {
+        await AquaReminderQueue.shared.enqueue(snap, clearDelivered: clearDelivered)
+    }
+
+    static func performRefresh(_ snap: AquaSnapshot, clearDelivered: Bool) async {
         let center = UNUserNotificationCenter.current()
-        registerCategories(center)
 
-        let delivered = await center.deliveredNotifications()
-        let stale = delivered
-            .map(\.request.identifier)
-            .filter { $0.hasPrefix("water.") || $0.hasPrefix("ritual.") }
-        if !stale.isEmpty {
-            center.removeDeliveredNotifications(withIdentifiers: stale)
+        if clearDelivered {
+            let delivered = await center.deliveredNotifications()
+            let stale = delivered
+                .map(\.request.identifier)
+                .filter { $0.hasPrefix("water.") || $0.hasPrefix("ritual.") }
+            if !stale.isEmpty {
+                center.removeDeliveredNotifications(withIdentifiers: stale)
+            }
         }
         center.removeAllPendingNotificationRequests()
 
@@ -95,26 +100,26 @@ enum AquaNotifications {
     }
 
     @discardableResult
-    static func seedYouTubeIfNeeded(_ snap: inout AquaSnapshot) -> Bool {
+    static func seedCreatorRitualsIfNeeded(_ snap: inout AquaSnapshot) -> Bool {
         let defaults = AquaPulseData.suite
-        guard defaults.bool(forKey: youtubeSeedKey) == false else { return false }
+        guard defaults.bool(forKey: creatorSeedKey) == false else { return false }
         guard snap.didOnboard == true else { return false }
-        defaults.set(true, forKey: youtubeSeedKey)
-        guard !snap.rituals.contains(where: \.isYouTube) else { return false }
-        guard let item = Ritual.catalog.first(where: { $0.kind == "youtube" }) else { return false }
-        snap.rituals.append(Ritual.fromCatalog(item))
-        return true
+        defaults.set(true, forKey: creatorSeedKey)
+        var added = false
+        for kind in Ritual.creatorKinds {
+            guard !snap.rituals.contains(where: { $0.kind == kind }) else { continue }
+            guard let item = Ritual.catalog.first(where: { $0.kind == kind }) else { continue }
+            snap.rituals.append(Ritual.fromCatalog(item))
+            added = true
+        }
+        return added
     }
 
     static func handleResponse(_ response: UNNotificationResponse) async {
-        let id = response.actionIdentifier
-        if id == logAction || (id == UNNotificationDefaultActionIdentifier && response.notification.request.identifier.hasPrefix("water.")) {
-            if id == logAction {
-                let snap = AquaPulseData.mutate { $0.logGlass() }
-                WidgetCenter.shared.reloadAllTimelines()
-                await refresh(snap)
-            }
-        }
+        guard response.actionIdentifier == logAction else { return }
+        let snap = AquaPulseData.mutate { $0.logGlass() }
+        WidgetCenter.shared.reloadAllTimelines()
+        await refresh(snap, clearDelivered: true)
     }
 
     static func shouldPresent(_ notification: UNNotification) -> UNNotificationPresentationOptions {
@@ -137,7 +142,8 @@ enum AquaNotifications {
         return fire > now ? fire : nil
     }
 
-    private static func registerCategories(_ center: UNUserNotificationCenter) {
+    static func registerCategories() {
+        let center = UNUserNotificationCenter.current()
         let log = UNNotificationAction(identifier: logAction, title: "Log a glass", options: [])
         let water = UNNotificationCategory(identifier: waterCategory, actions: [log], intentIdentifiers: [])
         center.setNotificationCategories([water])
@@ -166,22 +172,60 @@ enum AquaNotifications {
 
 final class AquaNotifyCenter: NSObject, UNUserNotificationCenterDelegate {
     static let shared = AquaNotifyCenter()
+    private static var didBootstrap = false
 
     static func bootstrap() {
-        UNUserNotificationCenter.current().delegate = shared
+        let center = UNUserNotificationCenter.current()
+        center.delegate = shared
+        guard !didBootstrap else { return }
+        didBootstrap = true
+        AquaNotifications.registerCategories()
     }
 
-    func userNotificationCenter(
+    nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
         AquaNotifications.shouldPresent(notification)
     }
 
-    func userNotificationCenter(
+    nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
         await AquaNotifications.handleResponse(response)
+    }
+}
+
+private actor AquaReminderQueue {
+    static let shared = AquaReminderQueue()
+
+    private var latest: AquaSnapshot?
+    private var clearDelivered = false
+    private var waiting: Task<Void, Never>?
+
+    func enqueue(_ snap: AquaSnapshot, clearDelivered: Bool) {
+        latest = snap
+        self.clearDelivered = self.clearDelivered || clearDelivered
+        guard waiting == nil else { return }
+        waiting = Task {
+            try? await Task.sleep(for: .milliseconds(750))
+            await self.drain()
+        }
+    }
+
+    private func drain() async {
+        waiting = nil
+        guard let snap = latest else { return }
+        let shouldClear = clearDelivered
+        latest = nil
+        clearDelivered = false
+        await AquaNotifications.performRefresh(snap, clearDelivered: shouldClear)
+        if latest != nil {
+            waiting = Task {
+                try? await Task.sleep(for: .milliseconds(300))
+                await self.drain()
+            }
+        }
     }
 }

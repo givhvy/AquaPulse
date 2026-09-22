@@ -17,7 +17,7 @@ enum AquaPulseData {
         let previousDay = snap.lastDay
         snap.rollDayIfNeeded()
         let rolled = !Calendar.current.isDate(previousDay, inSameDayAs: snap.lastDay)
-        let seeded = AquaNotifications.seedYouTubeIfNeeded(&snap)
+        let seeded = AquaNotifications.seedCreatorRitualsIfNeeded(&snap)
         if rolled || seeded {
             saveUnlocked(snap)
         }
@@ -53,7 +53,7 @@ enum AquaPulseData {
         lock.lock()
         defer { lock.unlock() }
         UserDefaults.standard.removeObject(forKey: persistKey)
-        UserDefaults.standard.removeObject(forKey: AquaNotifications.youtubeSeedKey)
+        UserDefaults.standard.removeObject(forKey: AquaNotifications.creatorSeedKey)
         deleteKeychain()
         postChangeUnlocked()
     }

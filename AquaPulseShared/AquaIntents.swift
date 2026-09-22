@@ -10,7 +10,7 @@ struct LogGlassIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         let snap = AquaPulseData.mutate { $0.logGlass() }
         WidgetCenter.shared.reloadAllTimelines()
-        await AquaNotifications.refresh(snap)
+        await AquaNotifications.refresh(snap, clearDelivered: true)
         return .result()
     }
 }
@@ -24,7 +24,7 @@ struct CheckInRitualIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         let snap = AquaPulseData.mutate { $0.checkInNextRitual() }
         WidgetCenter.shared.reloadAllTimelines()
-        await AquaNotifications.refresh(snap)
+        await AquaNotifications.refresh(snap, clearDelivered: true)
         return .result()
     }
 }

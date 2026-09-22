@@ -1,7 +1,9 @@
 import SwiftUI
+import UIKit
 
 @main
 struct AquaPulseApp: App {
+    @UIApplicationDelegateAdaptor(AquaAppDelegate.self) private var appDelegate
     @State private var store = AquaStore()
     @Environment(\.scenePhase) private var scenePhase
 
@@ -75,6 +77,16 @@ struct AquaRoot: View {
         }
         .tint(Aqua.mint)
         .aquaTabMinimize()
+    }
+}
+
+final class AquaAppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+        AquaNotifyCenter.bootstrap()
+        return true
     }
 }
 
