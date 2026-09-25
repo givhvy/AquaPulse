@@ -59,20 +59,13 @@ final class AquaStore {
         startListeningForWidget()
     }
 
-    deinit {
-        CFNotificationCenterRemoveObserver(
-            CFNotificationCenterGetDarwinNotifyCenter(),
-            Unmanaged.passUnretained(self).toOpaque(),
-            CFNotificationName(AquaPulseData.darwinName as CFString),
-            nil
-        )
-    }
-
-    func reloadFromDisk() {
+    func reloadFromDisk(refreshReminders: Bool = true) {
         load()
         seedWeekIfNeeded()
         syncWaterRitual()
-        Task { await AquaNotifications.refresh(snapshot()) }
+        guard refreshReminders else { return }
+        let snap = snapshot()
+        Task { await AquaNotifications.refresh(snap) }
     }
 
     func snapshot() -> AquaSnapshot {
@@ -317,26 +310,39 @@ final class AquaStore {
     }
 
     private func startListeningForWidget() {
-        let observer = Unmanaged.passUnretained(self).toOpaque()
+        AquaStoreRelay.shared.store = self
+        AquaStoreRelay.installIfNeeded()
+    }
+
+    private static var avatarURL: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("aqua.avatar.jpg")
+    }
+}
+
+@MainActor
+private final class AquaStoreRelay {
+    static let shared = AquaStoreRelay()
+    private static var installed = false
+    weak var store: AquaStore?
+
+    static func installIfNeeded() {
+        guard !installed else { return }
+        installed = true
         CFNotificationCenterAddObserver(
             CFNotificationCenterGetDarwinNotifyCenter(),
-            observer,
-            { _, observer, _, _, _ in
-                guard let observer else { return }
-                let store = Unmanaged<AquaStore>.fromOpaque(observer).takeUnretainedValue()
+            Unmanaged.passUnretained(shared).toOpaque(),
+            { _, _, _, _, _ in
                 DispatchQueue.main.async {
-                    store.reloadFromDisk()
+                    Task { @MainActor in
+                        AquaStoreRelay.shared.store?.reloadFromDisk(refreshReminders: false)
+                    }
                 }
             },
             AquaPulseData.darwinName as CFString,
             nil,
             .deliverImmediately
         )
-    }
-
-    private static var avatarURL: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("aqua.avatar.jpg")
     }
 }
 

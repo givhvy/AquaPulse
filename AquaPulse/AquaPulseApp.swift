@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UserNotifications
 
 @main
 struct AquaPulseApp: App {
@@ -29,15 +30,15 @@ struct AquaPulseApp: App {
             .environment(store)
             .preferredColorScheme(.dark)
             .onChange(of: scenePhase) { _, phase in
-                if phase == .active {
-                    AquaNotifyCenter.bootstrap()
+                guard phase == .active else { return }
+                Task { @MainActor in
                     store.reloadFromDisk()
                 }
             }
             .onAppear {
-                AquaNotifyCenter.bootstrap()
                 #if DEBUG
                 applyDebugLaunchSeed(store)
+                scheduleDebugNotificationIfNeeded()
                 #endif
             }
             .onOpenURL { url in
@@ -97,5 +98,17 @@ private func applyDebugLaunchSeed(_ store: AquaStore) {
     guard args.contains("-seedSession"), !store.didOnboard else { return }
     store.finishOnboarding(name: "Huy", goalML: 2000, glassML: 250, extraKinds: ["stretch"])
     store.setGlasses(3)
+}
+
+private func scheduleDebugNotificationIfNeeded() {
+    guard ProcessInfo.processInfo.arguments.contains("-debugNotification") else { return }
+    let content = UNMutableNotificationContent()
+    content.title = "Time to hydrate"
+    content.body = "500 ml left to hit 2.0 L (6/8 glasses)."
+    content.sound = .default
+    content.categoryIdentifier = AquaNotifications.waterCategory
+    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+    let request = UNNotificationRequest(identifier: "debug.tap", content: content, trigger: trigger)
+    UNUserNotificationCenter.current().add(request)
 }
 #endif

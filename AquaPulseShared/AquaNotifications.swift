@@ -2,6 +2,23 @@ import Foundation
 import UserNotifications
 import WidgetKit
 
+enum AquaNotificationGate {
+    private static let lock = NSLock()
+    private static var quietUntil = Date.distantPast
+
+    static func noteResponse() {
+        lock.lock()
+        quietUntil = Date().addingTimeInterval(2.5)
+        lock.unlock()
+    }
+
+    static var remainingQuiet: TimeInterval {
+        lock.lock()
+        defer { lock.unlock() }
+        return max(0, quietUntil.timeIntervalSinceNow)
+    }
+}
+
 enum AquaNotifications {
     static let waterCategory = "AQUA_WATER"
     static let logAction = "LOG_GLASS"
@@ -13,6 +30,7 @@ enum AquaNotifications {
 
     static func performRefresh(_ snap: AquaSnapshot, clearDelivered: Bool) async {
         let center = UNUserNotificationCenter.current()
+        registerCategories(center)
 
         if clearDelivered {
             let delivered = await center.deliveredNotifications()
@@ -115,13 +133,6 @@ enum AquaNotifications {
         return added
     }
 
-    static func handleResponse(_ response: UNNotificationResponse) async {
-        guard response.actionIdentifier == logAction else { return }
-        let snap = AquaPulseData.mutate { $0.logGlass() }
-        WidgetCenter.shared.reloadAllTimelines()
-        await refresh(snap, clearDelivered: true)
-    }
-
     static func shouldPresent(_ notification: UNNotification) -> UNNotificationPresentationOptions {
         let snap = AquaPulseData.load()
         let id = notification.request.identifier
@@ -142,8 +153,7 @@ enum AquaNotifications {
         return fire > now ? fire : nil
     }
 
-    static func registerCategories() {
-        let center = UNUserNotificationCenter.current()
+    static func registerCategories(_ center: UNUserNotificationCenter = .current()) {
         let log = UNNotificationAction(identifier: logAction, title: "Log a glass", options: [])
         let water = UNNotificationCategory(identifier: waterCategory, actions: [log], intentIdentifiers: [])
         center.setNotificationCategories([water])
@@ -172,28 +182,33 @@ enum AquaNotifications {
 
 final class AquaNotifyCenter: NSObject, UNUserNotificationCenterDelegate {
     static let shared = AquaNotifyCenter()
-    private static var didBootstrap = false
 
     static func bootstrap() {
-        let center = UNUserNotificationCenter.current()
-        center.delegate = shared
-        guard !didBootstrap else { return }
-        didBootstrap = true
-        AquaNotifications.registerCategories()
+        UNUserNotificationCenter.current().delegate = shared
     }
 
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
-        willPresent notification: UNNotification
-    ) async -> UNNotificationPresentationOptions {
-        AquaNotifications.shouldPresent(notification)
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler(AquaNotifications.shouldPresent(notification))
     }
 
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationResponse
-    ) async {
-        await AquaNotifications.handleResponse(response)
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        AquaNotificationGate.noteResponse()
+        let shouldLog = response.actionIdentifier == AquaNotifications.logAction
+        completionHandler()
+        guard shouldLog else { return }
+        Task {
+            let snap = AquaPulseData.mutate { $0.logGlass() }
+            WidgetCenter.shared.reloadAllTimelines()
+            await AquaNotifications.refresh(snap, clearDelivered: true)
+        }
     }
 }
 
@@ -215,6 +230,10 @@ private actor AquaReminderQueue {
     }
 
     private func drain() async {
+        let quiet = AquaNotificationGate.remainingQuiet
+        if quiet > 0 {
+            try? await Task.sleep(nanoseconds: UInt64(quiet * 1_000_000_000))
+        }
         waiting = nil
         guard let snap = latest else { return }
         let shouldClear = clearDelivered
